@@ -2,27 +2,47 @@
   <div class="flex items-center justify-center pt-3">
     <div class="p-4">
       <h1 class="text-2xl font-bold mb-4">Spaceflight Articles</h1>
-      <table class="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="px-4 py-2">Title</th>
-            <th class="px-4 py-2">Published</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            class="cursor-pointer hover:bg-gray-200"
-            v-for="article in paginatedArticles"
-            :key="article.id"
-            @click="openArticle(article.id)"
-          >
-            <td class="border px-4 py-2">{{ article.title }}</td>
-            <td class="border px-4 py-2">
-              {{ formatDate(article.published_at) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-hidden">
+        <table
+          ref="tableContainer"
+          :style="{ width: tableWidth }"
+          class="bg-white border border-gray-300"
+        >
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="px-4 py-2 cursor-pointer" @click="sortByTitle">
+                Title
+                <span class="sort-icon" :class="{ rotated: titleSortAsc }"
+                  >▲</span
+                >
+              </th>
+              <th class="px-4 py-2 cursor-pointer" @click="sortByPublished">
+                Published
+                <span class="sort-icon" :class="{ rotated: publishedSortAsc }"
+                  >▲</span
+                >
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(article, index) in paginatedArticles"
+              :key="article.id"
+              @click="openArticle(article.id)"
+              class="cursor-pointer hover:bg-gray-200"
+              :class="{
+                'bg-white': index % 2 === 0,
+                'bg-gray-100': index % 2 !== 0,
+              }"
+            >
+              <td class="border px-4 py-2">{{ article.title }}</td>
+              <td class="border px-4 py-2 nowrap-cell">
+                {{ formatDate(article.published_at) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <Pagination
         :totalItems="articles.length"
         :itemsPerPage="itemsPerPage"
@@ -45,6 +65,7 @@ export default {
     return {
       itemsPerPage: 20,
       currentPage: 1,
+      tableWidth: "100%",
     };
   },
   computed: {
@@ -57,24 +78,44 @@ export default {
       const end = start + this.itemsPerPage;
       return this.articles.slice(start, end);
     },
+    titleSortAsc() {
+      return this.$store.state.sortOrder.title === "asc";
+    },
+    publishedSortAsc() {
+      return this.$store.state.sortOrder.published === "asc";
+    },
+  },
+  watch: {
+    paginatedArticles() {
+      this.updateTableWidth();
+    },
   },
   methods: {
-    ...mapActions(["fetchArticles"]),
+    ...mapActions([
+      "fetchArticles",
+      "sortArticlesByTitle",
+      "sortArticlesByPublished",
+    ]),
     openArticle(id) {
       this.$router.push(`/article/${id}`);
     },
     formatDate(date) {
-      const options = {
+      return new Date(date).toLocaleString("de-DE", {
         year: "numeric",
-        month: "numeric",
-        day: "numeric",
+        month: "2-digit",
+        day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-      };
-      return new Date(date).toLocaleString(undefined, options);
+      });
     },
     changePage(page) {
       this.currentPage = page;
+    },
+    sortByTitle() {
+      this.sortArticlesByTitle();
+    },
+    sortByPublished() {
+      this.sortArticlesByPublished();
     },
   },
   created() {
@@ -82,3 +123,21 @@ export default {
   },
 };
 </script>
+
+<style>
+.nowrap-cell {
+  white-space: nowrap;
+  min-width: 140px;
+  text-align: center;
+}
+
+.sort-icon {
+  display: inline-block;
+  margin-left: 5px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+</style>

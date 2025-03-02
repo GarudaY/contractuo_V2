@@ -1,25 +1,54 @@
 <template>
-  <div class="p-4 w-1/2 flex flex-col">
-    <h1 class="text-2xl font-bold mb-4">{{ article?.title }}</h1>
-
-    <div v-show="article?.image_url" class="mb-4">
-      <img
-        :src="article.image_url"
-        :alt="article.title"
-        class="w-full max-w-2xl rounded shadow-lg"
-      />
-    </div>
-
-    <p class="mb-4 text-gray-700">{{ article?.summary }}</p>
-
-    <a
-      v-show="article?.url"
-      :href="article.url"
-      target="_blank"
-      class="text-blue-500 underline"
+  <div class="flex justify-center items-center min-h-screen px-4">
+    <div
+      class="w-full max-w-2xl bg-white rounded-lg p-6 text-center custom-shadow"
     >
-      Read original article
-    </a>
+      <button
+        @click="$router.push('/')"
+        class="flex items-center text-gray-600 hover:text-gray-800 mb-4"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M15 19l-7-7 7-7"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Back to articles
+      </button>
+
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ article?.title || "Loading..." }}
+      </h1>
+
+      <div v-if="article?.image_url" class="mb-4">
+        <img
+          :src="article.image_url"
+          :alt="article.title"
+          class="w-full max-h-80 object-cover rounded-lg shadow-2xl"
+        />
+      </div>
+
+      <p class="text-gray-700 text-lg leading-relaxed mb-6">
+        {{ article?.summary || "No summary available." }}
+      </p>
+
+      <a
+        v-if="article?.url"
+        :href="article.url"
+        target="_blank"
+        class="inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-2xl hover:bg-blue-600 transition-all"
+      >
+        Read Full Article
+      </a>
+    </div>
   </div>
 </template>
 
@@ -50,7 +79,7 @@ export default {
           const data = await response.json();
           this.article = data;
         } catch (error) {
-          console.error("Error loading articles:", error);
+          console.error("Error loading article:", error);
         }
       }
     },
@@ -60,3 +89,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.custom-shadow {
+  box-shadow: 0px 0px 30px 0px gray;
+}
+</style>
