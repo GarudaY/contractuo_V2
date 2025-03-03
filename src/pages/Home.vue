@@ -80,11 +80,7 @@ export default {
       return this.$store.state.sortOrder.published === "asc";
     },
   },
-  watch: {
-    paginatedArticles() {
-      this.updateTableWidth();
-    },
-  },
+
   methods: {
     ...mapActions([
       "fetchArticles",
