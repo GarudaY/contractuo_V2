@@ -3,11 +3,7 @@
     <div class="p-4">
       <h1 class="text-2xl font-bold mb-4">Spaceflight Articles</h1>
       <div class="overflow-hidden">
-        <table
-          ref="tableContainer"
-          :style="{ width: tableWidth }"
-          class="bg-white border border-gray-300"
-        >
+        <table ref="tableContainer" class="bg-white border border-gray-300">
           <thead>
             <tr class="bg-gray-200">
               <th class="px-4 py-2 cursor-pointer" @click="sortByTitle">
@@ -65,7 +61,6 @@ export default {
     return {
       itemsPerPage: 20,
       currentPage: 1,
-      tableWidth: "100%",
     };
   },
   computed: {
